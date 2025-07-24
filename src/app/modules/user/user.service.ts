@@ -1,3 +1,4 @@
+import { httpStatus } from 'http-status-codes';
 // import { StatusCodes } from 'http-status-codes';
 // import { User } from './user.model';
 // import { IAuthProvider, iUser } from "./user.interface"
@@ -67,9 +68,11 @@
 
 import { StatusCodes } from "http-status-codes";
 import { User } from "./user.model";
-import { IAuthProvider, iUser } from "./user.interface";
+import { IAuthProvider, iUser, Role } from "./user.interface";
 import bcryptjs from "bcryptjs";
 import AppError from "../../ErrorHelper/Apperror";
+import { envVars } from "../../config/env";
+import { JwtPayload } from "jsonwebtoken";
 
 const createUserService = async (payload: Partial<iUser>) => {
   const { email, password, ...rest } = payload;
@@ -79,7 +82,7 @@ const createUserService = async (payload: Partial<iUser>) => {
     throw new AppError(StatusCodes.BAD_REQUEST, "User already exists", "");
   }
 
-  const hashedPassword = await bcryptjs.hash(password as string, 10);
+  const hashedPassword = await bcryptjs.hash(password as string, Number(envVars.BCRYPT_SALT_ROUND));
 
   const authProvider: IAuthProvider = {
     provider: "credentials",
@@ -95,6 +98,56 @@ const createUserService = async (payload: Partial<iUser>) => {
 
   return user;
 };
+
+
+//  Update user.. password rehashing
+
+const updateUser = async (userId: string, payload : Partial<iUser>, decodedToken : JwtPayload) => {
+
+  const isUserExist = await User.findById(userId);
+  if(!isUserExist){
+    throw new AppError(httpStatus.NOT_FOUND,"user not found");
+  }
+
+  /**
+   * email - can not update
+   * name , phone, password address
+   * password - rehashing
+   * only admin superadmin - role, isDeleted
+   */
+
+  if(payload.role){
+    if(decodedToken.role === Role.User || decodedToken.role === Role.Guide){
+      throw new AppError(httpStatus.FORBIDDEN,"You are not authorised")
+    }
+    if(payload.role === Role.Super_Admin || decodedToken.role === Role.Admin){
+      throw new AppError(httpStatus.FORBIDDEN,"You are not authorised")
+    }
+  }
+
+
+  // Role user/guid hole update korte parbo na
+
+  if(payload.isActive || payload.isDeleted || payload.isVerified){
+    if(decodedToken.role === Role.User || decodedToken.role === Role.Guide){
+      throw new AppError(httpStatus.FORBIDDEN,"You are not authorised")
+    }
+  }
+
+  // password rehashing
+
+  if(payload.password){
+    payload.password = await bcryptjs.hash(payload.password,envVars.BCRYPT_SALT_ROUND)
+  }
+
+  // new update user
+
+  const newUpdateUser = await User.findByIdAndUpdate(userId, payload, { new : true, runValidators: true})
+
+
+}
+
+
 
 const getAllUsers = async () => {
   const users = await User.find({});

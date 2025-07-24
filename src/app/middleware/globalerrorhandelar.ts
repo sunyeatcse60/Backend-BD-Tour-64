@@ -8,7 +8,7 @@
 // export const globalErrorHandelar = (error: any, req: Request, res : Response, next : NextFunction) => {
 
 //     let statusCode = 500;
-//     let message = `Something went rong ${error.message} from global error!!`;
+//     let message = `Something went wrong ${error.message} from global error!!`;
 
 
 

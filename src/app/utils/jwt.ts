@@ -15,16 +15,17 @@
 
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 
-export const generateToken = (
-  payload: JwtPayload,
-  secret: string,
-  expiresIn: string
-): string => {
-  return jwt.sign(payload, secret, {
+
+export const generateToken = (payload: JwtPayload,secret: string,expiresIn: string): string => {
+  const token = jwt.sign(payload, secret, {
     expiresIn,
   } as SignOptions);
+  return token;
 };
 
 export const verifyToken = (token: string, secret: string): JwtPayload | string => {
-  return jwt.verify(token, secret);
+  const verifiedToken = jwt.verify(token, secret);
+  return verifiedToken;
 };
+
+

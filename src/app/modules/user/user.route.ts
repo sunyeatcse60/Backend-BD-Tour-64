@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // import { JwtPayload } from 'jsonwebtoken';
 // import { NextFunction, Request, Response, Router } from "express";
 // import { UserControllers } from "./user.controller";
@@ -66,41 +65,14 @@ import { Router } from "express";
 import { UserControllers } from "./user.controller";
 import { createUserZotSchema } from "./user.validation";
 import { validationRequest } from "../../middleware/validationRequest";
-import { verifyToken } from "../../utils/jwt";
-import { envVars } from "../../config/env";
-import { NextFunction, Request, Response } from "express";
+import { checkAuth } from "../../middleware/checkAuth";
+
 
 const router = Router();
 
-const checkAuth = (...authRoles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const accessToken = req.headers.authorization?.split(" ")[1]; // Bearer token
-
-    if (!accessToken) {
-      return res.status(403).json({ message: "No token received" });
-    }
-
-    const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET);
-
-    if (!verifiedToken || typeof verifiedToken === "string") {
-      return res.status(403).json({ message: "You are not authorized" });
-    }
-
-    if (!authRoles.includes(verifiedToken.role)) {
-      return res.status(403).json({ message: "You are not permitted to view this route" });
-    }
-
-    // Attach user info if needed
-    (req as any).user = verifiedToken;
-
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
 
 router.post("/register", validationRequest(createUserZotSchema), UserControllers.createUser);
 
-router.get("/all-users", checkAuth("Admin", "Super_Admin"), UserControllers.getAllUsers);
+router.get("/all-users", checkAuth("User","Admin", "Super_Admin"), UserControllers.getAllUsers);
 
 export const UserRoutes = router;

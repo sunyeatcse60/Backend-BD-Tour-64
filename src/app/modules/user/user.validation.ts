@@ -74,6 +74,8 @@ export const createUserZotSchema = z.object({
   address: z.string().max(200).optional(),
 });
 
+
+
 export const updateUserZotSchema = z.object({
   name: z
     .string({ invalid_type_error: "Name must be string" })

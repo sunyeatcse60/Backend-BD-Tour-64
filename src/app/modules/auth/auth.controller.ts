@@ -6,7 +6,7 @@
 // import { AuthServices } from './auth.service';
 
 
-// const credentialsLogin = catchAsyne(async (req: Request, res: Response, next: NextFunction) => {
+// const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
 // const loginInfo = await AuthServices.credentialsLogin(req.body)
 
