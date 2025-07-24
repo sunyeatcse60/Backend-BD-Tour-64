@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
 import { envVars } from "../config/env";
 import AppError from "../ErrorHelper/Apperror";
@@ -24,7 +23,7 @@ export const checkAuth = (...authRoles: string[]) => async (req: Request, res: R
       throw new AppError(403, "You are not permitted to view this route");
     }
 
-    (req as any).user = verifiedToken;
+    req.user = verifiedToken;
     next();
 
   } catch (error) {

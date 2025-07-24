@@ -63,9 +63,10 @@
 
 import { Router } from "express";
 import { UserControllers } from "./user.controller";
-import { createUserZotSchema } from "./user.validation";
+import { createUserZotSchema, updateUserZotSchema } from "./user.validation";
 import { validationRequest } from "../../middleware/validationRequest";
 import { checkAuth } from "../../middleware/checkAuth";
+import { Role } from "./user.interface";
 
 
 const router = Router();
@@ -74,5 +75,8 @@ const router = Router();
 router.post("/register", validationRequest(createUserZotSchema), UserControllers.createUser);
 
 router.get("/all-users", checkAuth("User","Admin", "Super_Admin"), UserControllers.getAllUsers);
+
+// update api - /api/v1/user/:id
+router.patch("/:id", validationRequest(updateUserZotSchema) ,checkAuth(...Object.values(Role)), UserControllers.updateUser);
 
 export const UserRoutes = router;

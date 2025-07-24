@@ -1,4 +1,3 @@
-import { httpStatus } from 'http-status-codes';
 // import { StatusCodes } from 'http-status-codes';
 // import { User } from './user.model';
 // import { IAuthProvider, iUser } from "./user.interface"
@@ -68,7 +67,7 @@ import { httpStatus } from 'http-status-codes';
 
 import { StatusCodes } from "http-status-codes";
 import { User } from "./user.model";
-import { IAuthProvider, iUser, Role } from "./user.interface";
+import { IAuthProvider,iUser, Role } from "./user.interface";
 import bcryptjs from "bcryptjs";
 import AppError from "../../ErrorHelper/Apperror";
 import { envVars } from "../../config/env";
@@ -100,14 +99,21 @@ const createUserService = async (payload: Partial<iUser>) => {
 };
 
 
+
+
+
 //  Update user.. password rehashing
 
-const updateUser = async (userId: string, payload : Partial<iUser>, decodedToken : JwtPayload) => {
+export const updateUser = async (userId: string, payload : Partial<iUser>, decodedToken : JwtPayload) => {
 
   const isUserExist = await User.findById(userId);
+
   if(!isUserExist){
-    throw new AppError(httpStatus.NOT_FOUND,"user not found");
+    throw new AppError(StatusCodes.NOT_FOUND,"user not found");
   }
+
+
+
 
   /**
    * email - can not update
@@ -118,10 +124,10 @@ const updateUser = async (userId: string, payload : Partial<iUser>, decodedToken
 
   if(payload.role){
     if(decodedToken.role === Role.User || decodedToken.role === Role.Guide){
-      throw new AppError(httpStatus.FORBIDDEN,"You are not authorised")
+      throw new AppError(StatusCodes.FORBIDDEN,"You are not authorised")
     }
     if(payload.role === Role.Super_Admin || decodedToken.role === Role.Admin){
-      throw new AppError(httpStatus.FORBIDDEN,"You are not authorised")
+      throw new AppError(StatusCodes.FORBIDDEN,"You are not authorised")
     }
   }
 
@@ -130,7 +136,7 @@ const updateUser = async (userId: string, payload : Partial<iUser>, decodedToken
 
   if(payload.isActive || payload.isDeleted || payload.isVerified){
     if(decodedToken.role === Role.User || decodedToken.role === Role.Guide){
-      throw new AppError(httpStatus.FORBIDDEN,"You are not authorised")
+      throw new AppError(StatusCodes.FORBIDDEN,"You are not authorised")
     }
   }
 
@@ -143,7 +149,8 @@ const updateUser = async (userId: string, payload : Partial<iUser>, decodedToken
   // new update user
 
   const newUpdateUser = await User.findByIdAndUpdate(userId, payload, { new : true, runValidators: true})
-
+  
+  return newUpdateUser
 
 }
 
@@ -162,4 +169,4 @@ const getAllUsers = async () => {
   };
 };
 
-export const UserServices = { createUserService, getAllUsers };
+export const UserServices = { createUserService, getAllUsers, updateUser };
