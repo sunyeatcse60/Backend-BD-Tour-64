@@ -57,7 +57,9 @@ export const createUserZotSchema = z.object({
     .string({ invalid_type_error: "Name must be string" })
     .min(4, { message: "At least 4 characters" })
     .max(50, { message: "Name too long." }),
+
   email: z.string().email(),
+  
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters" })

@@ -125,8 +125,6 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
 });
 
 
-
-
 const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.id;
   // const token = req.headers.authorization;
@@ -144,8 +142,6 @@ const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     data: user
   });
 });
-
-
 
 
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

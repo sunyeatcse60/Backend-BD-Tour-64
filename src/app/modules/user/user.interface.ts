@@ -68,6 +68,7 @@ export enum IsActive {
 }
 
 export interface iUser {
+  _id ?: Types.ObjectId
   name: string;
   email: string;
   password?: string;

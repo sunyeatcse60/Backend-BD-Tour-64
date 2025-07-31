@@ -111,10 +111,6 @@ export const updateUser = async (userId: string, payload : Partial<iUser>, decod
   if(!isUserExist){
     throw new AppError(StatusCodes.NOT_FOUND,"user not found");
   }
-
-
-
-
   /**
    * email - can not update
    * name , phone, password address
@@ -130,7 +126,6 @@ export const updateUser = async (userId: string, payload : Partial<iUser>, decod
       throw new AppError(StatusCodes.FORBIDDEN,"You are not authorised")
     }
   }
-
 
   // Role user/guid hole update korte parbo na
 
